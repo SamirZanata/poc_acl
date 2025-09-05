@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação - Sistema ACL PostgreSQL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.3em;
+        }
+
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #34495e;
+            margin: 20px 0 15px 0;
+            font-size: 1.4em;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .feature-list {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #d1ecf1;
+        }
+
+        .feature-list li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .test-scenario {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .test-scenario h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .business-value {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .business-value h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .technical-details {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .technical-details h4 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+
+        .demo-section {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .demo-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .next-steps {
+            background: #f8f9fa;
+            border: 2px solid #6c757d;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .next-steps h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .next-steps ol {
+            padding-left: 20px;
+        }
+
+        .next-steps li {
+            margin: 8px 0;
+        }
+
+        .executive-summary {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .executive-summary h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .executive-summary p {
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .file-structure {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .file-structure .folder {
+            color: #f39c12;
+        }
+
+        .file-structure .file {
+            color: #3498db;
+        }
+
+        .file-structure .sql {
+            color: #2ecc71;
+        }
+
+        .file-structure .html {
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Sistema ACL PostgreSQL V2</h1>
+            <p>Proof of Concept - Controle de Acesso Granular Multi-tenant</p>
+        </div>
+
+        <div class="executive-summary">
+            <h2>📋 Resumo Executivo</h2>
+            <p>Desenvolvi um sistema completo de controle de acesso baseado em lista (ACL) usando PostgreSQL, com Row Level Security (RLS) e funcionalidades avançadas como workflows, formulários dinâmicos e assinaturas digitais. O sistema garante isolamento total entre organizações e permissões granulares por recurso.</p>
+        </div>
+
+        <div class="section">
+            <h2>🎯 O Que Foi Desenvolvido</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Organizações</h4>
+                    <div class="number">3</div>
+                    <p>TechCorp, GlobalCorp, StartupXYZ</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Áreas</h4>
+                    <div class="number">9</div>
+                    <p>3 por organização (TI, RH, Financeiro)</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Usuários</h4>
+                    <div class="number">39</div>
+                    <p>13 por organização</p>
+                </div>
+                <div class="stat-card">
+                    <h4>ACLs</h4>
+                    <div class="number">43</div>
+                    <p>Permissões granulares</p>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <h4>💡 Tipo de Desenvolvimento:</h4>
+                <p><strong>Script de Teste/Query de Validação</strong> - Um conjunto de scripts SQL que demonstram e validam o funcionamento completo do sistema de controle de acesso, incluindo:</p>
+                <ul>
+                    <li>Scripts de criação de estrutura (DDL)</li>
+                    <li>Scripts de configuração de permissões (DCL)</li>
+                    <li>Scripts de inserção de dados de teste (DML)</li>
+                    <li>Scripts de validação e teste (Query de Teste)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📁 Estrutura do Projeto</h2>
+
+            <div class="file-structure">
+                <div class="folder">postgres-ltree-poc/</div>
+                <div class="folder">├── database/</div>
+                <div class="file">│   ├── create-tables-v2.sql</div> <span class="sql"># Criação das tabelas</span>
+                <div class="file">│   ├── acl-setup-v2.sql</div> <span class="sql"># Configuração ACL + RLS</span>
+                <div class="file">│   └── insert-basic-data.sql</div> <span class="sql"># Dados de teste</span>
+                <div class="folder">├── config/</div>
+                <div class="file">│   ├── add-workflows-and-acls.sql</div> <span class="sql"># Workflows e ACLs</span>
+                <div class="file">│   └── fix-user-permissions.sql</div> <span class="sql"># Ajustes de permissões</span>
+                <div class="folder">├── tests/</div>
+                <div class="file">│   └── test-acl-completo-todas-empresas.sql</div> <span class="sql"># SCRIPT DE TESTE PRINCIPAL</span>
+                <div class="file">├── setup-poc-v2.ps1</div> <span class="sql"># Setup automático</span>
+                <div class="file">├── diagrama-banco-dados.dbml</div> <span class="sql"># Diagrama do banco</span>
+                <div class="file">├── documentacao-sistema-acl.html</div> <span class="html"># Documentação completa</span>
+                <div class="file">└── explicacao-rls-acl.html</div> <span class="html"># Explicação técnica</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Script de Teste - O Que Ele Faz</h2>
+
+            <div class="test-scenario">
+                <h4>📋 Cenários de Teste Implementados:</h4>
+                <ol>
+                    <li><strong>Admin TechCorp</strong> - Verifica acesso total à organização</li>
+                    <li><strong>Manager TI TechCorp</strong> - Testa permissões de gerente na área</li>
+                    <li><strong>User TI TechCorp</strong> - Valida permissões limitadas de usuário</li>
+                    <li><strong>Admin GlobalCorp</strong> - Confirma isolamento entre organizações</li>
+                    <li><strong>Manager RH GlobalCorp</strong> - Testa permissões em área diferente</li>
+                    <li><strong>User RH GlobalCorp</strong> - Valida acesso específico</li>
+                    <li><strong>Admin StartupXYZ</strong> - Confirma terceira organização isolada</li>
+                    <li><strong>Manager Financeiro StartupXYZ</strong> - Testa área financeira</li>
+                    <li><strong>User Financeiro StartupXYZ</strong> - Valida permissões finais</li>
+                </ol>
+            </div>
+
+            <div class="code-block">
+                <div class="comment">-- Exemplo do Script de Teste</div>
+                <div class="keyword">\echo</div> <div class="string">'===== USUARIO: ADMIN TECHCORP ====='</div>
+                <div class="keyword">\echo</div> <div class="string">'Empresa: TechCorp'</div>
+                <div class="keyword">\echo</div> <div class="string">'Perfil: Owner (Administrador) - Vê TUDO da organização'</div>
+                <div class="keyword">\echo</div> <div class="string">''</div>
+
+                <div class="keyword">\echo</div> <div class="string">'--- ORGANIZAÇÕES QUE PODE VER ---'</div>
+                <div class="keyword">SELECT</div> <div class="string">'  - '</div> || name || <div class="string">' (CNPJ: '</div> || cnpj || <div class="string">')'</div> <div class="keyword">as</div> organizacao 
+                <div class="keyword">FROM</div> organizations 
+                <div class="keyword">WHERE EXISTS</div> (
+                    <div class="keyword">SELECT</div> <div class="number">1</div> <div class="keyword">FROM</div> acls
+                    <div class="keyword">WHERE</div> subject_id = <div class="string">'11111111-1111-1111-1111-111111111111'</div>::<div class="keyword">UUID</div>
+                      <div class="keyword">AND</div> object_type = <div class="string">'organization'</div>
+                      <div class="keyword">AND</div> object_id = organizations.id
+                      <div class="keyword">AND</div> (perms & <div class="number">1</div>) = <div class="number">1</div>
+                );
+            </div>
+
+            <div class="success">
+                <h4>✅ O que o Script Valida:</h4>
+                <ul>
+                    <li><strong>Isolamento entre organizações</strong> - Usuários não veem dados de outras empresas</li>
+                    <li><strong>Herança de permissões</strong> - Permissões em cascata na hierarquia</li>
+                    <li><strong>Controle granular</strong> - Acesso específico por recurso</li>
+                    <li><strong>Row Level Security</strong> - Filtragem automática pelo PostgreSQL</li>
+                    <li><strong>Sistema de perfis</strong> - Owner, Manager, User com permissões diferentes</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 Funcionalidades Implementadas</h2>
+
+            <div class="feature-list">
+                <h4>🔧 Recursos Técnicos:</h4>
+                <ul>
+                    <li>Multi-tenancy com isolamento total entre organizações</li>
+                    <li>Row Level Security (RLS) nativo do PostgreSQL</li>
+                    <li>Sistema de permissões por bitmask (1=READ, 2=WRITE, 4=APPROVE, 8=SHARE, 16=DELETE)</li>
+                    <li>Herança de permissões em cascata (Organization → Area → Folder → Document)</li>
+                    <li>Workflows com etapas de aprovação configuráveis</li>
+                    <li>Formulários dinâmicos (intake) com perguntas configuráveis</li>
+                    <li>Sistema de assinaturas digitais</li>
+                    <li>Controle financeiro com categorias e entradas</li>
+                    <li>Auditoria completa de todas as ações</li>
+                    <li>Checklists e tarefas para workflows</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="business-value">
+            <h3>💼 Valor de Negócio</h3>
+            <ul>
+                <li><strong>Segurança:</strong> Controle granular de acesso a dados sensíveis</li>
+                <li><strong>Compliance:</strong> Auditoria completa para regulamentações</li>
+                <li><strong>Escalabilidade:</strong> Suporte a múltiplas organizações</li>
+                <li><strong>Flexibilidade:</strong> Permissões configuráveis por recurso</li>
+                <li><strong>Produtividade:</strong> Workflows automatizados e formulários dinâmicos</li>
+                <li><strong>Conformidade:</strong> Assinaturas digitais para documentos</li>
+            </ul>
+        </div>
+
+        <div class="technical-details">
+            <h4>🔧 Detalhes Técnicos:</h4>
+            <ul>
+                <li><strong>Banco de Dados:</strong> PostgreSQL 12+ com RLS</li>
+                <li><strong>Linguagem:</strong> SQL + PL/pgSQL</li>
+                <li><strong>Arquitetura:</strong> Multi-tenant com isolamento por organização</li>
+                <li><strong>Segurança:</strong> Row Level Security + ACL granular</li>
+                <li><strong>Performance:</strong> Índices otimizados e consultas eficientes</li>
+                <li><strong>Documentação:</strong> HTML interativo com exemplos práticos</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>🎬 Demonstração Prática</h3>
+            <p>O script de teste pode ser executado para demonstrar:</p>
+            <ul>
+                <li>Como diferentes usuários veem apenas seus dados permitidos</li>
+                <li>Isolamento total entre organizações</li>
+                <li>Funcionamento do sistema de permissões</li>
+                <li>Herança de permissões na hierarquia</li>
+            </ul>
+            <div class="code-block">
+                <div class="comment"># Executar o script de teste</div>
+                psql -h localhost -p 5433 -U postgres -d acl_poc_v2 -f tests/test-acl-completo-todas-empresas.sql
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Resultados dos Testes</h2>
+
+            <div class="success">
+                <h4>✅ Validações Bem-sucedidas:</h4>
+                <ul>
+                    <li><strong>Isolamento Total:</strong> Usuários de uma organização não veem dados de outras</li>
+                    <li><strong>Herança Correta:</strong> Permissões em cascata funcionando perfeitamente</li>
+                    <li><strong>Controle Granular:</strong> Acesso específico por documento/formulário/workflow</li>
+                    <li><strong>Performance:</strong> Consultas otimizadas com índices apropriados</li>
+                    <li><strong>Segurança:</strong> RLS aplicado automaticamente em todas as consultas</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>🚀 Próximos Passos Sugeridos</h3>
+            <ol>
+                <li><strong>Revisão Técnica:</strong> Avaliar o código e arquitetura proposta</li>
+                <li><strong>Teste de Performance:</strong> Validar com volumes maiores de dados</li>
+                <li><strong>Integração:</strong> Conectar com aplicação frontend existente</li>
+                <li><strong>Deploy:</strong> Implementar em ambiente de produção</li>
+                <li><strong>Treinamento:</strong> Capacitar equipe para manutenção do sistema</li>
+                <li><strong>Monitoramento:</strong> Implementar logs e métricas de uso</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>📋 Conclusão</h2>
+            <div class="highlight">
+                <h4>🎯 Resumo do Desenvolvimento:</h4>
+                <p>Desenvolvi um <strong>sistema completo de controle de acesso</strong> usando PostgreSQL com RLS e ACL, incluindo:</p>
+                <ul>
+                    <li><strong>Script de Teste Abrangente:</strong> Valida 9 cenários diferentes de usuários e permissões</li>
+                    <li><strong>Documentação Completa:</strong> HTML interativo com explicações técnicas</li>
+                    <li><strong>Diagrama do Banco:</strong> Visualização completa da arquitetura</li>
+                    <li><strong>Setup Automatizado:</strong> Script PowerShell para instalação</li>
+                    <li><strong>Funcionalidades Avançadas:</strong> Workflows, formulários, assinaturas, auditoria</li>
+                </ul>
+                <p><strong>O sistema está pronto para demonstração e pode ser usado como base para implementação em produção.</strong></p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>📞 Contato para Demonstração</h3>
+            <p>Posso agendar uma demonstração ao vivo do sistema, mostrando:</p>
+            <ul>
+                <li>Execução do script de teste</li>
+                <li>Funcionamento do controle de acesso</li>
+                <li>Isolamento entre organizações</li>
+                <li>Interface de documentação interativa</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

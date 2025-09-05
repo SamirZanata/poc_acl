@@ -1,0 +1,624 @@
+// =====================================================
+// DIAGRAMA COMPLETO - SISTEMA ACL V2
+// =====================================================
+
+// =====================================================
+// ORGANIZAÇÕES & TENANT
+// =====================================================
+
+Table organizations {
+  id uuid [pk]
+  parent_org_id uuid
+  onlyoffice_id text
+  name text [unique]
+  cnpj text
+  segment text
+  sector text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table organization_whitelabel_setup {
+  id uuid [pk]
+  org_id uuid
+  logo_email text
+  logo_platform text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table organization_limits {
+  id uuid [pk]
+  org_id uuid
+  docs_sent int
+  users int
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table organization_api_key {
+  id uuid [pk]
+  org_id uuid
+  key text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table areas {
+  id uuid [pk]
+  organization_id uuid
+  name text
+  description text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+// =====================================================
+// USUÁRIOS & ASSOCIAÇÕES
+// =====================================================
+
+Table users {
+  id uuid [pk]
+  organization_id uuid
+  name text
+  email text [unique]
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table users_organizations {
+  id uuid [pk]
+  user_id uuid
+  organization_id uuid
+  profile_id uuid
+  is_owner boolean
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table user_accounts {
+  id uuid [pk]
+  user_id uuid
+  first_name text
+  last_name text
+  profile_photo text
+  department text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table users_areas {
+  id uuid [pk]
+  user_id uuid
+  area_id uuid
+  profile_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+// =====================================================
+// PERFIS & AÇÕES (RBAC macro)
+// =====================================================
+
+Table profiles {
+  id uuid [pk]
+  name text [unique]
+  description text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table system_actions {
+  id uuid [pk]
+  name text [unique]
+  description text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table profile_system_actions {
+  id uuid [pk]
+  profile_id uuid
+  system_action_id uuid
+  created_at timestamptz
+}
+
+// =====================================================
+// CONTATOS & PARTES
+// =====================================================
+
+Table contacts {
+  id uuid [pk]
+  org_id uuid
+  first_name text
+  last_name text
+  phone_number text
+  email text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table qualifications {
+  id uuid [pk]
+  name text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table parties {
+  id uuid [pk]
+  workflow_card_id uuid
+  contact_id uuid
+  type text
+  qualification_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+// =====================================================
+// ARQUIVOS & DOCUMENTOS
+// =====================================================
+
+Table folders {
+  id uuid [pk]
+  area_id uuid
+  parent_folder_id uuid
+  name text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table documents {
+  id uuid [pk]
+  folder_id uuid
+  dependent_document_id uuid
+  dependent_document_type_id uuid
+  onlyoffice_id text
+  name text
+  mime text
+  size int
+  resume text
+  object text
+  value decimal(10,2)
+  effective_date timestamptz
+  expiry_date timestamptz
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table dependent_document_types {
+  id uuid [pk]
+  name text
+  org_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table document_models {
+  id uuid [pk]
+  area_id uuid
+  onlyoffice_id text
+  name text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table document_attachments {
+  id uuid [pk]
+  document_id uuid
+  goto_signature boolean
+  onlyoffice_id text
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+// =====================================================
+// FORMULÁRIOS (INTAKE)
+// =====================================================
+
+Table forms {
+  id uuid [pk]
+  area_id uuid
+  document_model_id uuid
+  name text
+  description text
+  form_schema jsonb
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table questions {
+  id uuid [pk]
+  form_id uuid
+  name text
+  type text
+  document_model_variable text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table question_options {
+  id uuid [pk]
+  question_id uuid
+  value text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table form_requests {
+  id uuid [pk]
+  form_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table form_request_answers {
+  id uuid [pk]
+  form_request_id uuid
+  question text
+  answer text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+// =====================================================
+// WORKFLOWS
+// =====================================================
+
+Table workflows {
+  id uuid [pk]
+  area_id uuid
+  name text
+  description text
+  is_active boolean
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table workflow_steps {
+  id uuid [pk]
+  workflow_id uuid
+  step_name text
+  step_order int
+  step_type text
+  assigned_to uuid
+  is_required boolean
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table document_workflows {
+  id uuid [pk]
+  document_id uuid
+  workflow_id uuid
+  current_step_id uuid
+  status text
+  started_at timestamptz
+  completed_at timestamptz
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table workflow_steps_approvers {
+  id uuid [pk]
+  workflow_step_id uuid
+  user_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table workflow_card {
+  id uuid [pk]
+  description text
+  workflow_step_id uuid
+  form_request_id uuid
+  document_id uuid
+  assignee_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table workflow_card_external_accesses {
+  id uuid [pk]
+  name text
+  email text
+  type text
+  workflow_card_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table workflow_reminders {
+  id uuid [pk]
+  workflow_id uuid
+  name text
+  content text
+  receivers text[]
+  send_at timestamptz
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+// =====================================================
+// CHECKLISTS & TAREFAS
+// =====================================================
+
+Table checklist_models {
+  id uuid [pk]
+  name text
+  workflow_step_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table task_models {
+  id uuid [pk]
+  name text
+  tasks_list_model_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table checklist_card_workflow_step {
+  id uuid [pk]
+  name text
+  workflow_card_id uuid
+  workflow_step_type text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table tasks_checklist_card {
+  id uuid [pk]
+  name text
+  status text
+  comment text
+  checklist_card_workflow_step_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+  done_at timestamptz
+}
+
+// =====================================================
+// ASSINATURAS
+// =====================================================
+
+Table signatures {
+  id uuid [pk]
+  workflow_card_id uuid
+  external_id text
+  provider text
+  provider_document_key text
+  is_ordered boolean
+  completed_at timestamptz
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table signers {
+  id uuid [pk]
+  signature_id uuid
+  provider_signer_key text
+  external_id text
+  signed_at timestamptz
+  order int
+  name text
+  email text
+  phone_number text
+  qualification text
+  send_whatsapp boolean
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+// =====================================================
+// FINANCEIRO
+// =====================================================
+
+Table financial_entry_categories {
+  id uuid [pk]
+  name text
+  org_id uuid
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+Table financial_entries {
+  id uuid [pk]
+  name text
+  type text
+  category_id uuid
+  document_id uuid
+  value decimal(10,2)
+  due_date timestamptz
+  payment_method text
+  paid_at timestamptz
+  obs text
+  created_at timestamptz
+  updated_at timestamptz
+  deleted_at timestamptz
+}
+
+// =====================================================
+// ACL
+// =====================================================
+
+Table acls {
+  id uuid [pk]
+  subject_id uuid
+  object_type resource_type
+  object_id uuid
+  perms int
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Enum resource_type {
+  organization
+  area
+  folder
+  document
+  form
+  workflow
+}
+
+// =====================================================
+// AUDITORIA
+// =====================================================
+
+Table log_actions {
+  id uuid [pk]
+  user_id uuid
+  locale_event text
+  identifier text
+  before_state jsonb
+  after_state jsonb
+  created_at timestamptz
+}
+
+// =====================================================
+// RELACIONAMENTOS
+// =====================================================
+
+// Organizações
+Ref: organizations.parent_org_id > organizations.id
+Ref: organization_whitelabel_setup.org_id > organizations.id
+Ref: organization_limits.org_id > organizations.id
+Ref: organization_api_key.org_id > organizations.id
+Ref: areas.organization_id > organizations.id
+
+// Usuários
+Ref: users.organization_id > organizations.id
+Ref: users_organizations.user_id > users.id
+Ref: users_organizations.organization_id > organizations.id
+Ref: users_organizations.profile_id > profiles.id
+Ref: user_accounts.user_id > users.id
+Ref: users_areas.user_id > users.id
+Ref: users_areas.area_id > areas.id
+Ref: users_areas.profile_id > profiles.id
+
+// Perfis e Ações
+Ref: profile_system_actions.profile_id > profiles.id
+Ref: profile_system_actions.system_action_id > system_actions.id
+
+// Contatos
+Ref: contacts.org_id > organizations.id
+Ref: parties.workflow_card_id > workflow_card.id
+Ref: parties.contact_id > contacts.id
+Ref: parties.qualification_id > qualifications.id
+
+// Documentos
+Ref: folders.area_id > areas.id
+Ref: folders.parent_folder_id > folders.id
+Ref: documents.folder_id > folders.id
+Ref: documents.dependent_document_id > documents.id
+Ref: documents.dependent_document_type_id > dependent_document_types.id
+Ref: dependent_document_types.org_id > organizations.id
+Ref: document_models.area_id > areas.id
+Ref: document_attachments.document_id > documents.id
+
+// Formulários
+Ref: forms.area_id > areas.id
+Ref: forms.document_model_id > document_models.id
+Ref: questions.form_id > forms.id
+Ref: question_options.question_id > questions.id
+Ref: form_requests.form_id > forms.id
+Ref: form_request_answers.form_request_id > form_requests.id
+
+// Workflows
+Ref: workflows.area_id > areas.id
+Ref: workflow_steps.workflow_id > workflows.id
+Ref: workflow_steps.assigned_to > users.id
+Ref: document_workflows.document_id > documents.id
+Ref: document_workflows.workflow_id > workflows.id
+Ref: document_workflows.current_step_id > workflow_steps.id
+Ref: workflow_steps_approvers.workflow_step_id > workflow_steps.id
+Ref: workflow_steps_approvers.user_id > users.id
+Ref: workflow_card.workflow_step_id > workflow_steps.id
+Ref: workflow_card.form_request_id > form_requests.id
+Ref: workflow_card.document_id > documents.id
+Ref: workflow_card.assignee_id > users.id
+Ref: workflow_card_external_accesses.workflow_card_id > workflow_card.id
+Ref: workflow_reminders.workflow_id > workflows.id
+
+// Checklists
+Ref: checklist_models.workflow_step_id > workflow_steps.id
+Ref: task_models.tasks_list_model_id > checklist_models.id
+Ref: checklist_card_workflow_step.workflow_card_id > workflow_card.id
+Ref: tasks_checklist_card.checklist_card_workflow_step_id > checklist_card_workflow_step.id
+
+// Assinaturas
+Ref: signatures.workflow_card_id > workflow_card.id
+Ref: signers.signature_id > signatures.id
+
+// Financeiro
+Ref: financial_entry_categories.org_id > organizations.id
+Ref: financial_entries.category_id > financial_entry_categories.id
+Ref: financial_entries.document_id > documents.id
+
+// ACL polimórfico (object_id pode apontar para múltiplos tipos)
+Ref: acls.object_id > organizations.id
+Ref: acls.object_id > areas.id
+Ref: acls.object_id > folders.id
+Ref: acls.object_id > documents.id
+Ref: acls.object_id > forms.id
+Ref: acls.object_id > workflows.id
+
+// Auditoria
+Ref: log_actions.user_id > users.id
+
+// =====================================================
+// COMENTÁRIOS E DOCUMENTAÇÃO
+// =====================================================
+
+// Sistema ACL V2 - POC Completo
+// 
+// ESTRUTURA:
+// - 3 Organizações (TechCorp, GlobalCorp, StartupXYZ)
+// - 9 Áreas (3 por organização: TI, RH, Financeiro)
+// - 39 Usuários (13 por organização: 1 Owner + 6 Managers + 6 Users)
+// - 43 ACLs (permissões granulares)
+//
+// FUNCIONALIDADES:
+// - Multi-tenancy com isolamento total
+// - Hierarquia de permissões (Owner > Manager > User)
+// - Sistema de perfis e ações
+// - Workflows com etapas
+// - Hierarquia de pastas
+// - Formulários (intake)
+// - Assinaturas digitais
+// - Sistema financeiro
+// - Auditoria completa
+// - Row Level Security (RLS)
+//
+// PERMISSÕES (Bitmask):
+// - 1 = READ (Leitura)
+// - 2 = WRITE (Escrita)
+// - 4 = APPROVE (Aprovação)
+// - 8 = SHARE (Compartilhamento)
+// - 16 = DELETE (Exclusão)
+// - 31 = FULL (Todas as permissões)

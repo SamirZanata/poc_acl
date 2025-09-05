@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Como RLS e ACL Funcionam Juntos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .flow-diagram {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-step {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #3498db;
+            margin: 0 10px;
+        }
+
+        .example-box {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .example-box h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .bitmask-explanation {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .bitmask-example {
+            background: #34495e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .policy-explanation {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .policy-explanation h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .step-by-step {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .step-by-step h4 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+
+        .step-by-step ol {
+            padding-left: 20px;
+        }
+
+        .step-by-step li {
+            margin: 8px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .rls-policy {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .rls-policy .comment {
+            color: #95a5a6;
+        }
+
+        .rls-policy .keyword {
+            color: #e74c3c;
+        }
+
+        .rls-policy .function {
+            color: #f39c12;
+        }
+
+        .rls-policy .string {
+            color: #2ecc71;
+        }
+
+        .rls-policy .number {
+            color: #9b59b6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Como RLS e ACL Funcionam Juntos</h1>
+            <p>Explicação Detalhada do Sistema de Controle de Acesso</p>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Conceito Geral</h2>
+            <p><strong>Sim, você cria políticas RLS baseadas na tabela ACL!</strong> O RLS (Row Level Security) é o mecanismo do PostgreSQL que filtra automaticamente as linhas que um usuário pode ver, e as políticas RLS consultam a tabela ACL para determinar quais linhas o usuário tem permissão para acessar.</p>
+            
+            <div class="flow-diagram">
+                <h3>🔄 Fluxo de Funcionamento</h3>
+                <div class="flow-step">Usuário faz consulta</div>
+                <span class="arrow">↓</span>
+                <div class="flow-step">PostgreSQL aplica RLS</div>
+                <span class="arrow">↓</span>
+                <div class="flow-step">Política consulta ACL</div>
+                <span class="arrow">↓</span>
+                <div class="flow-step">Retorna apenas dados permitidos</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🏗️ Arquitetura do Sistema</h2>
+            
+            <div class="step-by-step">
+                <h4>📋 Componentes Principais:</h4>
+                <ol>
+                    <li><strong>Tabela ACL</strong> - Armazena as permissões (quem pode fazer o quê)</li>
+                    <li><strong>Políticas RLS</strong> - Regras que consultam a tabela ACL</li>
+                    <li><strong>Função set_current_user()</strong> - Define qual usuário está logado</li>
+                    <li><strong>Bitmask de Permissões</strong> - Sistema de permissões granular</li>
+                </ol>
+            </div>
+
+            <div class="example-box">
+                <h4>💡 Exemplo Prático:</h4>
+                <p>Quando um usuário faz <code>SELECT * FROM documents</code>, o PostgreSQL:</p>
+                <ol>
+                    <li>Identifica o usuário atual via <code>current_setting('app.current_user_id')</code></li>
+                    <li>Aplica a política RLS que consulta a tabela ACL</li>
+                    <li>Retorna apenas os documentos que o usuário tem permissão de ler</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Como as Políticas RLS Funcionam</h2>
+
+            <div class="policy-explanation">
+                <h4>📋 Estrutura de uma Política RLS:</h4>
+                <p>Toda política RLS tem esta estrutura:</p>
+                <ul>
+                    <li><strong>FOR SELECT/INSERT/UPDATE/DELETE</strong> - Define qual operação a política controla</li>
+                    <li><strong>USING</strong> - Condição que deve ser verdadeira para permitir acesso</li>
+                    <li><strong>Consulta à tabela ACL</strong> - Verifica se existe permissão</li>
+                </ul>
+            </div>
+
+            <div class="rls-policy">
+                <div class="comment">-- Exemplo: Política de leitura para organizações</div>
+                <div class="keyword">CREATE POLICY</div> org_read_policy <div class="keyword">ON</div> organizations
+                <div class="keyword">    FOR SELECT</div>
+                <div class="keyword">    USING</div> (
+                <div class="keyword">        EXISTS</div> (
+                <div class="keyword">            SELECT</div> <div class="number">1</div> <div class="keyword">FROM</div> acls
+                <div class="keyword">            WHERE</div> subject_id = <div class="function">current_setting</div>(<div class="string">'app.current_user_id'</div>)::<div class="keyword">UUID</div>
+                <div class="keyword">              AND</div> object_type = <div class="string">'organization'</div>
+                <div class="keyword">              AND</div> object_id = organizations.id
+                <div class="keyword">              AND</div> (perms & <div class="number">1</div>) = <div class="number">1</div>
+                <div class="keyword">        )</div>
+                <div class="keyword">    )</div>;
+            </div>
+
+            <div class="highlight">
+                <h4>🔍 Explicação da Política:</h4>
+                <ul>
+                    <li><strong>current_setting('app.current_user_id')</strong> - Pega o ID do usuário logado</li>
+                    <li><strong>object_type = 'organization'</strong> - Filtra permissões para organizações</li>
+                    <li><strong>object_id = organizations.id</strong> - Verifica permissão para esta organização específica</li>
+                    <li><strong>(perms & 1) = 1</strong> - Verifica se tem permissão de leitura (bit 1)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎭 Sistema de Bitmask de Permissões</h2>
+
+            <div class="bitmask-explanation">
+                <h4>💡 Como Funciona o Bitmask:</h4>
+                <p>As permissões são representadas por bits:</p>
+                <div class="bitmask-example">
+                    <p>1 = READ   (00001) - Leitura</p>
+                    <p>2 = WRITE  (00010) - Escrita</p>
+                    <p>4 = APPROVE (00100) - Aprovação</p>
+                    <p>8 = SHARE  (01000) - Compartilhamento</p>
+                    <p>16 = DELETE (10000) - Exclusão</p>
+                    <p>31 = FULL  (11111) - Todas as permissões</p>
+                </div>
+                <p>Para verificar se tem uma permissão específica:</p>
+                <div class="bitmask-example">
+                    <p>if (user_perms & 1) == 1 then user_can_read = true</p>
+                    <p>if (user_perms & 2) == 2 then user_can_write = true</p>
+                    <p>if (user_perms & 4) == 4 then user_can_approve = true</p>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h4>📊 Exemplos de Combinações:</h4>
+                <ul>
+                    <li><strong>3</strong> = READ + WRITE (1 + 2)</li>
+                    <li><strong>7</strong> = READ + WRITE + APPROVE (1 + 2 + 4)</li>
+                    <li><strong>15</strong> = READ + WRITE + APPROVE + SHARE (1 + 2 + 4 + 8)</li>
+                    <li><strong>31</strong> = Todas as permissões (1 + 2 + 4 + 8 + 16)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔄 Herança de Permissões em Cascata</h2>
+
+            <div class="policy-explanation">
+                <h4>📁 Política para Pastas (com herança):</h4>
+                <p>As políticas podem verificar permissões em múltiplos níveis da hierarquia:</p>
+            </div>
+
+            <div class="rls-policy">
+                <div class="comment">-- Política de leitura para pastas com herança</div>
+                <div class="keyword">CREATE POLICY</div> folder_read_policy <div class="keyword">ON</div> folders
+                <div class="keyword">    FOR SELECT</div>
+                <div class="keyword">    USING</div> (
+                <div class="keyword">        EXISTS</div> (
+                <div class="keyword">            SELECT</div> <div class="number">1</div> <div class="keyword">FROM</div> acls
+                <div class="keyword">            WHERE</div> subject_id = <div class="function">current_setting</div>(<div class="string">'app.current_user_id'</div>)::<div class="keyword">UUID</div>
+                <div class="keyword">              AND</div> (
+                <div class="comment">                  -- Permissão direta na pasta</div>
+                <div class="keyword">                  (</div>object_type = <div class="string">'folder'</div> <div class="keyword">AND</div> object_id = folders.id <div class="keyword">AND</div> (perms & <div class="number">1</div>) = <div class="number">1</div><div class="keyword">)</div>
+                <div class="keyword">                  OR</div>
+                <div class="comment">                  -- Permissão na área pai</div>
+                <div class="keyword">                  (</div>object_type = <div class="string">'area'</div> <div class="keyword">AND</div> object_id = folders.area_id <div class="keyword">AND</div> (perms & <div class="number">1</div>) = <div class="number">1</div><div class="keyword">)</div>
+                <div class="keyword">                  OR</div>
+                <div class="comment">                  -- Permissão na organização pai</div>
+                <div class="keyword">                  (</div>object_type = <div class="string">'organization'</div> <div class="keyword">AND</div> object_id = (
+                <div class="keyword">                      SELECT</div> organization_id <div class="keyword">FROM</div> areas <div class="keyword">WHERE</div> id = folders.area_id
+                <div class="keyword">                  )</div> <div class="keyword">AND</div> (perms & <div class="number">1</div>) = <div class="number">1</div><div class="keyword">)</div>
+                <div class="keyword">              )</div>
+                <div class="keyword">        )</div>
+                <div class="keyword">    )</div>;
+            </div>
+
+            <div class="success">
+                <h4>✅ Hierarquia de Herança:</h4>
+                <p><strong>Organization → Area → Folder → Document</strong></p>
+                <p>Se um usuário tem permissão em um nível superior, automaticamente herda permissões nos níveis inferiores.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ Configuração do Usuário Atual</h2>
+
+            <div class="code-block">
+                <div class="comment">-- Função para definir o usuário atual</div>
+                <div class="keyword">CREATE OR REPLACE FUNCTION</div> set_current_user(p_user_id <div class="keyword">UUID</div>)
+                <div class="keyword">RETURNS VOID AS</div> $$
+                <div class="keyword">BEGIN</div>
+                    <div class="keyword">    PERFORM</div> set_config(<div class="string">'app.current_user_id'</div>, p_user_id::<div class="keyword">TEXT</div>, <div class="keyword">FALSE</div>);
+                <div class="keyword">END</div>;
+                $$ <div class="keyword">LANGUAGE</div> plpgsql;
+            </div>
+
+            <div class="example-box">
+                <h4>🔧 Como Usar:</h4>
+                <ol>
+                    <li>Antes de fazer consultas, execute: <code>SELECT set_current_user('user-uuid-here');</code></li>
+                    <li>O PostgreSQL armazena o ID do usuário em uma variável de sessão</li>
+                    <li>As políticas RLS usam essa variável para verificar permissões</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Comparação: RLS vs ACL</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspecto</th>
+                        <th>RLS (Row Level Security)</th>
+                        <th>ACL (Access Control List)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Função</strong></td>
+                        <td>Mecanismo do PostgreSQL para filtrar linhas</td>
+                        <td>Tabela que armazena as permissões</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Onde é definido</strong></td>
+                        <td>Políticas SQL no banco de dados</td>
+                        <td>Dados na tabela acls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quando é aplicado</strong></td>
+                        <td>Automaticamente em todas as consultas</td>
+                        <td>Consultado pelas políticas RLS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance</strong></td>
+                        <td>Filtra no nível do banco (muito eficiente)</td>
+                        <td>Consultado via JOIN/EXISTS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flexibilidade</strong></td>
+                        <td>Limitada às políticas SQL</td>
+                        <td>Totalmente flexível (qualquer lógica)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Exemplo Prático Completo</h2>
+
+            <div class="step-by-step">
+                <h4>📋 Cenário: Usuário tenta acessar documentos</h4>
+                <ol>
+                    <li><strong>Usuário faz login:</strong> <code>SELECT set_current_user('11111111-1111-1111-1111-111111111111');</code></li>
+                    <li><strong>Usuário consulta documentos:</strong> <code>SELECT * FROM documents;</code></li>
+                    <li><strong>PostgreSQL aplica RLS:</strong> Executa a política document_read_policy</li>
+                    <li><strong>Política consulta ACL:</strong> Busca permissões do usuário na tabela acls</li>
+                    <li><strong>Verifica herança:</strong> Checa permissões em document → folder → area → organization</li>
+                    <li><strong>Retorna resultado:</strong> Apenas documentos que o usuário pode ver</li>
+                </ol>
+            </div>
+
+            <div class="example-box">
+                <h4>💾 Dados na Tabela ACL:</h4>
+                <div class="code-block">
+                    <div class="comment">-- Exemplo de registros ACL</div>
+                    <div class="keyword">INSERT INTO</div> acls <div class="keyword">VALUES</div>
+                    (<div class="string">'acl-1'</div>, <div class="string">'user-1'</div>, <div class="string">'organization'</div>, <div class="string">'org-1'</div>, <div class="number">31</div>), <div class="comment">-- Acesso total à organização</div>
+                    (<div class="string">'acl-2'</div>, <div class="string">'user-2'</div>, <div class="string">'area'</div>, <div class="string">'area-1'</div>, <div class="number">7</div>), <div class="comment">-- READ+WRITE+APPROVE na área</div>
+                    (<div class="string">'acl-3'</div>, <div class="string">'user-3'</div>, <div class="string">'document'</div>, <div class="string">'doc-1'</div>, <div class="number">1</div>); <div class="comment">-- Apenas leitura do documento</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✅ Vantagens do Sistema</h2>
+
+            <div class="success">
+                <h4>🚀 Benefícios:</h4>
+                <ul>
+                    <li><strong>Segurança Automática:</strong> RLS aplica filtros automaticamente</li>
+                    <li><strong>Performance:</strong> Filtragem no nível do banco de dados</li>
+                    <li><strong>Flexibilidade:</strong> ACL permite permissões granulares</li>
+                    <li><strong>Herança:</strong> Permissões em cascata na hierarquia</li>
+                    <li><strong>Multi-tenancy:</strong> Isolamento total entre organizações</li>
+                    <li><strong>Auditoria:</strong> Todas as consultas são automaticamente filtradas</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                <h4>⚠️ Pontos de Atenção:</h4>
+                <ul>
+                    <li><strong>Configuração do usuário:</strong> Sempre definir o usuário atual antes das consultas</li>
+                    <li><strong>Performance:</strong> Políticas complexas podem impactar performance</li>
+                    <li><strong>Debugging:</strong> Pode ser difícil debugar problemas de permissão</li>
+                    <li><strong>Manutenção:</strong> Políticas RLS precisam ser mantidas junto com a tabela ACL</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎉 Conclusão</h2>
+            <div class="highlight">
+                <h4>💡 Resumo:</h4>
+                <p><strong>Sim, você cria políticas RLS baseadas na tabela ACL!</strong> O RLS é o mecanismo que filtra automaticamente as linhas, e as políticas RLS consultam a tabela ACL para determinar quais linhas o usuário pode acessar. É um sistema poderoso que combina a eficiência do RLS com a flexibilidade do ACL.</p>
+                
+                <p>O sistema funciona assim:</p>
+                <ol>
+                    <li>Configure o usuário atual com <code>set_current_user()</code></li>
+                    <li>As políticas RLS consultam a tabela ACL automaticamente</li>
+                    <li>O PostgreSQL retorna apenas os dados permitidos</li>
+                    <li>O sistema suporta herança de permissões em cascata</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
