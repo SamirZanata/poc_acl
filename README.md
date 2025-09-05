@@ -170,7 +170,7 @@ Este projeto é uma POC para demonstração de conceitos de controle de acesso c
 
 ## 👨‍💻 Autor
 
-Desenvolvido como Proof of Concept para demonstrar arquitetura de controle de acesso granular com PostgreSQL RLS + ACL.
+**Samir Zanata** - Desenvolvido como Proof of Concept para demonstrar arquitetura de controle de acesso granular com PostgreSQL RLS + ACL.
 
 ---
 
